@@ -6,7 +6,7 @@ import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 public class IDSearch {
-	private static final int MAX_DEPTH = 85;
+	private static final int MAX_DEPTH = 50;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("---------- Iterative Deepening Example ----------");
@@ -35,10 +35,10 @@ public class IDSearch {
 
 			System.out.println("\n---------- Solving Problem " + (i + 1) + " ----------");
 
-			for (int j = 0; j <= MAX_DEPTH - 1; j++) {
-				boolean solved = depthLimitedSearch(j, problem);
+			for (int j = 1; j <= MAX_DEPTH; j++) {
+				boolean solved = depthLimitedSearch(j - 1, problem);
 
-				if (solved) {
+				if (solved) {					
 					break;
 				}
 			}
@@ -57,36 +57,38 @@ public class IDSearch {
 		Stack<SearchNode> frontier = new Stack<>();
 		List<SearchNode> explored = new ArrayList<>();
 		SearchNode startNode = init(problem);
-		boolean solved = false;		
+		boolean solved = false;
 
 		frontier.add(startNode);
 
-		for(int i = 0; i < depthLimit + 1; i++) {
+		while (!frontier.isEmpty()) {
 			// Get the next node to explore
-			SearchNode currentNode = frontier.pop();						
-			
-			// Add node to explored set
-			explored.add(currentNode);
+			SearchNode currentNode = frontier.pop();
 
-			// Expand node and get reachable neighbours
-			for (SearchNode node : currentNode.expand()) {
-				if (problem[node.getY()][node.getX()] != 1) {
-					if (problem[node.getY()][node.getX()] == 3) {
-						System.out.print("\nProblem Solved at Depth: " + node.getDepth());
-						System.out.print("\nGoal Coordinates: x = " + node.getX() + ", y = " + node.getY());
+			if (currentNode.getDepth() <= depthLimit) {
+				// Add node to explored set
+				explored.add(currentNode);
 
-						solved = true;
+				// Expand node and get reachable neighbours
+				for (SearchNode node : currentNode.expand()) {
+					if (problem[node.getY()][node.getX()] != 1) {
+						if (problem[node.getY()][node.getX()] == 3) {
+							System.out.print("\nProblem Solved at Depth: " + node.getDepth());
+							System.out.print("\nGoal Coordinates: x = " + node.getX() + ", y = " + node.getY());
 
-						return solved;
-					} else if (!frontier.contains(node) && !explored.contains(node)) {
-						frontier.add(node);
-					}										
-				}				
-			}						
+							solved = true;
+
+							return solved;
+						} else if (!frontier.contains(node) && !explored.contains(node)) {
+							frontier.add(node);
+						}
+					}
+				}
+			}
 		}
 
 		return solved;
-	}	
+	}
 
 	private List<int[][]> getProblems() {
 		List<int[][]> problems = new ArrayList<>();
