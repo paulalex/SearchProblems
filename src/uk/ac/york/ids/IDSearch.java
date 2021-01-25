@@ -1,12 +1,13 @@
 package uk.ac.york.ids;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 public class IDSearch {
-	private static final int MAX_DEPTH = 50;
+	private static final int MAX_DEPTH = 90;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("---------- Iterative Deepening Example ----------");
@@ -56,30 +57,27 @@ public class IDSearch {
 	private boolean depthLimitedSearch(int depthLimit, int[][] problem) throws Exception {
 		Stack<SearchNode> frontier = new Stack<>();
 		List<SearchNode> explored = new ArrayList<>();
-		SearchNode startNode = init(problem);
-		boolean solved = false;
+		SearchNode startNode = init(problem);		
 
 		frontier.add(startNode);
-
-		while (!frontier.isEmpty()) {
-			// Get the next node to explore
-			SearchNode currentNode = frontier.pop();
-
-			if (currentNode.getDepth() <= depthLimit) {
+		
+		while (!frontier.isEmpty()) {			
+			// Get the next node to explore			
+			SearchNode currentNode = frontier.pop();			
+			
+			if (currentNode.getDepth() <= depthLimit) {				
 				// Add node to explored set
 				explored.add(currentNode);
-
+				
 				// Expand node and get reachable neighbours
-				for (SearchNode node : currentNode.expand()) {
+				for (SearchNode node : currentNode.expand()) {					
 					if (problem[node.getY()][node.getX()] != 1) {
 						if (problem[node.getY()][node.getX()] == 3) {
 							System.out.print("\nProblem Solved at Depth: " + node.getDepth());
-							System.out.print("\nGoal Coordinates: x = " + node.getX() + ", y = " + node.getY());
-
-							solved = true;
-
-							return solved;
-						} else if (!frontier.contains(node) && !explored.contains(node)) {
+							System.out.print("\nGoal Coordinates: x = " + node.getX() + ", y = " + node.getY() + "\n");													
+							
+							return true;
+						} else if (!frontier.contains(node) && !explored.contains(node)) {							
 							frontier.add(node);
 						}
 					}
@@ -87,9 +85,26 @@ public class IDSearch {
 			}
 		}
 
-		return solved;
+		return false;
 	}
-
+	
+	private void printSolution(SearchNode node) {
+		List<SearchNode> searchPath = new ArrayList<>();
+		
+		while(node.getParent() != null) {
+			
+			searchPath.add(node.getParent());
+			
+			node = node.getParent();
+		}
+		
+		Collections.reverse(searchPath);
+		
+		for(SearchNode searchNode : searchPath) {
+			System.out.println(searchNode);
+		}
+	}
+	
 	private List<int[][]> getProblems() {
 		List<int[][]> problems = new ArrayList<>();
 
@@ -108,7 +123,7 @@ public class IDSearch {
 		for (int y = 0; y < problemSpace.length; y++) {
 			for (int x = 0; x < problemSpace[y].length; x++) {
 				if (problemSpace[y][x] == 2) {
-					initialNode = new SearchNode((byte) x, (byte) y, (byte) 0);
+					initialNode = new SearchNode((byte) x, (byte) y, (byte) 0, null);
 				}
 			}
 		}

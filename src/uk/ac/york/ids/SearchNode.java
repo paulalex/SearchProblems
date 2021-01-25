@@ -7,12 +7,14 @@ public class SearchNode {
 	private byte x;
 	private byte y;
 	private byte depth;
+	private SearchNode parent;
 	
-	public SearchNode(byte x, byte y, byte depth) {
+	public SearchNode(byte x, byte y, byte depth, SearchNode parent) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.depth = depth;
+		this.parent = parent;
 	}
 
 	public byte getX() {
@@ -27,6 +29,10 @@ public class SearchNode {
 		return depth;
 	}
 	
+	public SearchNode getParent() {
+		return parent;
+	}
+	
 	public List<SearchNode> expand() {
 		List<SearchNode> neighbours = new ArrayList<SearchNode>();
 		byte depth = (byte) (this.getDepth() + 1);
@@ -35,25 +41,25 @@ public class SearchNode {
 		
 		// if column is 0 no left neighbour
 		if(x != 0) {
-			SearchNode left = new SearchNode((byte) (x - 1), y, depth);
+			SearchNode left = new SearchNode((byte) (x - 1), y, depth, this);
 			neighbours.add(left);
 		}
 		
 		// If column is 14 no right neighbour
 		if(x != 14) {
-			SearchNode right = new SearchNode((byte) (x + 1), y, depth);
+			SearchNode right = new SearchNode((byte) (x + 1), y, depth, this);
 			neighbours.add(right);
 		}
 		
 		// If row is 0 no up neighbour
 		if(y != 0) {
-			SearchNode up = new SearchNode(x, (byte) (y - 1), depth);
+			SearchNode up = new SearchNode(x, (byte) (y - 1), depth, this);
 			neighbours.add(up);
 		}
 
 		// if row is 14 no down neighbour
 		if(y != 14) {
-			SearchNode down = new SearchNode(x, (byte) (y + 1), depth);
+			SearchNode down = new SearchNode(x, (byte) (y + 1), depth, this);
 			neighbours.add(down);
 		}
 		
@@ -82,6 +88,8 @@ public class SearchNode {
 		if (x != other.x)
 			return false;
 		if (y != other.y)
+			return false;
+		if (depth != other.depth)
 			return false;
 		return true;
 	}
